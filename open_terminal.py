@@ -1,5 +1,6 @@
 import tkinter as tk
 
+
 # Create the main window
 window = tk.Tk()
 window.title('My terminal')
