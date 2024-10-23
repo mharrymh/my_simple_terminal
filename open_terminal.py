@@ -30,13 +30,16 @@ def prevent_cursor_move(event):
     if text.compare("insert", "<", "prompt_end"):
         text.mark_set("insert", "end")  # Keep cursor after prompt
         return "break"
-    
+
 
 def execute(event):
     '''Execute the user input'''
     user_input = text.get('prompt_end', 'end')
-    executer.run(user_input)
-
+    executer.run(user_input, insert_prompt)
+    #Handle exit logic
+    if text.get('1.0', 'end-1c').endswith('Exiting!!'):
+        window.destroy()
+        return
     text.insert('end','\n') #Add a new line
     insert_prompt()
     

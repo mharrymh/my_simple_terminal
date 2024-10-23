@@ -3,50 +3,52 @@ from saved_commands import load_commands as commands
 from errors_manager import SyntaxError , ParsingError, ExecutionError
 import os
 
-def run(user_input:str)->None:
+def run(user_input:str, display_message)->None:
     tokens:list = user_input.split() #Remove special characters and return a list
-    if (len(tokens) == 0 or not parse(tokens[:])):
+    if (len(tokens) == 0 or not parse(tokens[:], display_message)):
         return
-    execute(tokens)
+    execute(tokens, display_message)
 
-def parse(tokens:list)->bool:
+def parse(tokens:list, display_message)->bool:
+    print(tokens)
     token = tokens.pop(0)
+    print(tokens)
     if token == 'add':
-        return parse_add_expr(tokens)
+        return parse_add_expr(tokens, display_message)
     elif token == 'rm':
-        return parse_rm_expr(tokens)
+        return parse_rm_expr(tokens, display_message)
     elif token == 'ls' or token == 'exit':
         if len(tokens) != 0:
-            error = ParsingError(f'"{tokens[0]}" is not an accepted command after "{token}".\nTry with only "{token}" next time.')
+            error = ParsingError(f'"{tokens[0]}" is not an accepted command after "{token}".\nTry with only "{token}" next time.', display_message)
             error.display()
             return False
     else:
         if not token in commands():
-            error = ParsingError(f'"{token}" is not an existing command.\nTry with "ls" to see available commands.\nTry with "add [command] [path]" to add a new command')
+            error = ParsingError(f'"{token}" is not an existing command.\nTry with "ls" to see available commands.\nTry with "add [command] [path]" to add a new command', display_message)
             error.display()
             return False
         elif len(tokens) != 0:
-            error = SyntaxError(f'"{tokens[0]}" not valid after: "{token}"')
+            error = SyntaxError(f'"{tokens[0]}" not valid after: "{token}"', display_message)
             error.display()
             return False
     return True
         
 
-def parse_add_expr(tokens:list)->bool:
+def parse_add_expr(tokens:list, display_message)->bool:
     if len(tokens) != 2:
-        error = ParsingError(f'"add" command only accepts two arguments.\nTry with "add [command] [path]"')
+        error = ParsingError(f'"add" command only accepts two arguments.\nTry with "add [command] [path]"', display_message)
         error.display()
         return False
     return True
 
 
-def parse_rm_expr(tokens:list)->bool:
+def parse_rm_expr(tokens:list, display_message)->bool:
     if len(tokens) != 1:
-        error = ParsingError(f'"rm" command only accepts one argument.\nTry with "rm [command]"')
+        error = ParsingError(f'"rm" command only accepts one argument.\nTry with "rm [command]"', display_message)
         error.display()
         return False
     elif tokens[0] not in commands():
-        error = ParsingError(f'"{tokens[0]}" is not an existing command.')
+        error = ParsingError(f'"{tokens[0]}" is not an existing command.', display_message)
         error.display()
         return False
     return True
@@ -56,8 +58,7 @@ def ls(orders, display):
     display(message)
 
 def exit(orders, display):
-    from open_terminal import window
-    window.destroy()
+    display('Exiting!!')
 
 def add(orders, display):
     command, path = tuple(orders)
@@ -65,7 +66,7 @@ def add(orders, display):
         save({command : path})
         display(f'Your command {command} was added successfully!')
     else:
-        error = ExecutionError(f'{path} is not a valid path.\nTry again!')
+        error = ExecutionError(f'{path} is not a valid path.\nTry again!', display)
         error.display()
 
 def rm(orders, display):
@@ -84,6 +85,7 @@ def execute_command(command):
         os.startfile(path)  # Only in windows
     except Exception as e:
         error = ExecutionError(f"Error opening the file: {e}")
+        error.display()
 
 
 
@@ -94,12 +96,9 @@ execution_dict = {
     'rm' : rm
 }
 
-def execute(tokens:list)->None:
+def execute(tokens:list, display_message)->None:
     token = tokens.pop(0)
     if token in execution_dict:
-        from open_terminal import insert_prompt
-        execution_dict[token](tokens, insert_prompt)
+        execution_dict[token](tokens, display_message)
     else:
         execute_command(token)
-
-
