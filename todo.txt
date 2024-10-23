@@ -1,1 +1,1 @@
-separar por espacios los comandos de ls
+Probar la funcionalidad de add y de command

@@ -54,11 +54,15 @@ def parse_rm_expr(tokens:list, display_message)->bool:
     return True
 
 def ls(orders, display):
-    message = " ".join(commands().keys())
-    display(message)
+    commands_names = commands().keys()
+    if len(commands_names) == 0:
+        display('\nNot available commands!\nTry adding some with "add [command] [path]"')
+        return
+    for c in commands_names:
+        display('\n' + c)
 
 def exit(orders, display):
-    display('Exiting!!')
+    display('\nExiting!!')
 
 def add(orders, display):
     command, path = tuple(orders)
@@ -72,9 +76,9 @@ def add(orders, display):
 def rm(orders, display):
     command = orders[0]
     saved_commands = commands()
-    saved_commands.remove(command)
+    saved_commands.pop(command)
     save(saved_commands, overwrite=True)
-    display(f'Your command {command} was removed successfully!')
+    display(f'\nYour command {command} was removed successfully!')
 
 
 def execute_command(command):
