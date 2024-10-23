@@ -1,0 +1,10 @@
+import tkinter as tk
+
+Crear la ventana: tk.Tk()
+Cambiar titulo: .title('titulo')
+Cambiar icono: .iconbitmap('ruta/al/archivo.ico') //la imagen tiene que ser .ico
+Cambiar size: .geometry('200x300')
+Cambiar color de fondo: .config(bg='black')
+
+//Para evitar la consola de python detras
+//cambiar .py por .pyw
