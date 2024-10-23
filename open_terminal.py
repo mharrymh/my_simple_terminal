@@ -1,4 +1,5 @@
 import tkinter as tk
+import executer
 
 
 # Create the main window
@@ -29,6 +30,17 @@ def prevent_cursor_move(event):
     if text.compare("insert", "<", "prompt_end"):
         text.mark_set("insert", "end")  # Keep cursor after prompt
         return "break"
+    
+
+def execute(event):
+    '''Execute the user input'''
+    user_input = text.get('prompt_end', 'end')
+    executer.run(user_input)
+
+    text.insert('end','\n') #Add a new line
+    insert_prompt()
+    
+    return 'break' #Avoid adding a new line after 'Enter' is pressed
 
 # Initialize the prompt
 insert_prompt()
@@ -38,5 +50,7 @@ text.bind('<BackSpace>', block_delete)  # Block backspace before prompt
 text.bind("<KeyRelease>", prevent_cursor_move)  # Prevent moving cursor before prompt
 text.bind("<Key>", prevent_cursor_move)
 text.bind("<ButtonRelease-1>", prevent_cursor_move)  # Prevent mouse click before prompt
+
+text.bind('<Return>', execute)
 
 window.mainloop()
