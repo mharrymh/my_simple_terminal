@@ -3,6 +3,8 @@ from saved_commands import load_commands as commands
 from errors_manager import SyntaxError , ParsingError, ExecutionError
 import os
 import shlex
+import webbrowser
+import requests
 
 def run(user_input:str, display_message)->None:
     tokens:list = shlex.split(user_input) #Remove special characters and return a list
@@ -63,13 +65,25 @@ def ls(orders, display):
 def exit(orders, display):
     display('\nExiting!!')
 
+def is_url(url):
+    try:
+        response = requests.head(url, allow_redirects=True)
+        # Check if the response code is in the 200 range
+        if response.status_code == 200:
+            return True
+        else:
+            return False
+    except requests.RequestException:
+        # If there was an issue with the request (e.g., invalid URL format), return False
+        return False
+
 def add(orders, display):
     command, path = tuple(orders)
-    if os.path.isfile(path) or os.path.isdir(path):
+    if os.path.isfile(path) or os.path.isdir(path) or is_url(path):
         save({command : path})
         display(f'\nYour command {command} was added successfully!')
     else:
-        error = ExecutionError(f'{path} is not a valid path.\nTry again!\nNote: The path has to be inside quotation marks', display)
+        error = ExecutionError(f'{path} is not a valid path or url.\nTry again!\nNote: The path has to be inside quotation marks', display)
         error.display()
 
 def rm(orders, display):
@@ -85,9 +99,12 @@ def execute_command(command):
     path = saved_commands[command]
 
     try:
-        os.startfile(path)  # Only in windows
+        if os.path.isfile(path) or os.path.isdir(path):
+            os.startfile(path) # Only in windows
+        else: #is a url
+            webbrowser.open(path)
     except Exception as e:
-        error = ExecutionError(f"Error opening the file: {e}")
+        error = ExecutionError(f"Error opening: {e}")
         error.display()
 
 
