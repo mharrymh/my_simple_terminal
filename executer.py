@@ -2,17 +2,16 @@ from saved_commands import save_commands as save
 from saved_commands import load_commands as commands 
 from errors_manager import SyntaxError , ParsingError, ExecutionError
 import os
+import shlex
 
 def run(user_input:str, display_message)->None:
-    tokens:list = user_input.split() #Remove special characters and return a list
+    tokens:list = shlex.split(user_input) #Remove special characters and return a list
     if (len(tokens) == 0 or not parse(tokens[:], display_message)):
         return
     execute(tokens, display_message)
 
 def parse(tokens:list, display_message)->bool:
-    print(tokens)
     token = tokens.pop(0)
-    print(tokens)
     if token == 'add':
         return parse_add_expr(tokens, display_message)
     elif token == 'rm':
@@ -66,11 +65,11 @@ def exit(orders, display):
 
 def add(orders, display):
     command, path = tuple(orders)
-    if os.path.isfile(path):
+    if os.path.isfile(path) or os.path.isdir(path):
         save({command : path})
-        display(f'Your command {command} was added successfully!')
+        display(f'\nYour command {command} was added successfully!')
     else:
-        error = ExecutionError(f'{path} is not a valid path.\nTry again!', display)
+        error = ExecutionError(f'{path} is not a valid path.\nTry again!\nNote: The path has to be inside quotation marks', display)
         error.display()
 
 def rm(orders, display):

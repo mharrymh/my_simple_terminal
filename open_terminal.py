@@ -37,7 +37,7 @@ def execute(event):
     user_input = text.get('prompt_end', 'end')
     executer.run(user_input, insert_prompt)
     #Handle exit logic
-    if text.get('1.0', 'end-1c').endswith('Exiting!!'):
+    if 'Exiting!!' in text.get('1.0', 'end-1c'):
         window.destroy()
         return
     text.insert('end','\n') #Add a new line
